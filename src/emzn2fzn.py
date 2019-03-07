@@ -29,7 +29,7 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description='emzn2fzn')
+    parser = argparse.ArgumentParser(description='emzn2fzn.py')
     parser.add_argument("model", metavar="<model>.mzn", type=str,
                         help="The MiniZinc model", action=check_ext(['mzn']))
     parser.add_argument("--fzn", "--output-fzn-to-file", metavar="<file>",
