@@ -59,6 +59,9 @@ To make this change permanent, please consider editing the
 
 ## EXAMPLE
 
+This example requires [`OptiMathSAT`](http://optimathsat.disi.unitn.it/)
+version `1.6.2` or superior.
+
 The original `SMT2` model is *satisfiable*:
 
     ~$ optimathsat -input=smt2 -opt.verbose=True < example/model.smt2
