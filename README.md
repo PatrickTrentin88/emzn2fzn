@@ -110,3 +110,8 @@ solution is found:
 Please contact the author of this repository, or the current maintainer
 of the [`OptiMathSAT`](http://optimathsat.disi.unitn.it/), in the case
 that there is still any persisting issue with your `MiniZinc` models.
+
+## Contributors
+
+This project is authored by [Patrick Trentin](http://www.patricktrentin.com) (<patrick.trentin.88@gmail.com>).
+
