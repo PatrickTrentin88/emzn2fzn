@@ -2,7 +2,7 @@
 
 The **emzn2fzn** project tweaks the output of the `mzn2fzn` compiler
 so as to get around some of its limitations and make the best use
-of `OptiMathSAT`.
+of [`OptiMathSAT`](http://optimathsat.disi.unitn.it/).
 
 
 ## THE PROBLEM
@@ -12,7 +12,8 @@ division (NUM / DEN) among two floating-point values <NUM, DEN>
 with the result of this division. By construction, this result
 is a finite-precision floating-point value.
 
-This represents a limitation for the OMT solver `OptiMathSAT`,
+This represents a limitation for the OMT solver
+[`OptiMathSAT`](http://optimathsat.disi.unitn.it/),
 which can deal with `FlatZinc` files using infinite-precision
 arithmetic, because the presence of finite-precision
 floating-point values in the `FlatZinc` model can alter
@@ -97,11 +98,12 @@ solution is found:
                    -opt.verbose=True \
                    < example/enhanced.fzn
     ...
-    (objectives
-     (cost 34)
-    )
+    opt_var_0 = 34;
+    ----------
+    =========
     
 ## NOTES
 
-Please contact the author of this repository in the case that there
-is still any persisting issue with `OptiMathSAT` and your own models.
+Please contact the author of this repository, or the current maintainer
+of the [`OptiMathSAT`](http://optimathsat.disi.unitn.it/), in the case
+that there is still any persisting issue with your `MiniZinc` models.
