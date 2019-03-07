@@ -40,8 +40,8 @@ To make this change permanent, please consider editing the
 
 ## USAGE
 
-    ~$ emzn2fzn
-    usage: emzn2fzn [-h] [--fzn <file>] [--output-base <name>] [--var-name <name>]
+    ~$ emzn2fzn.py
+    usage: emzn2fzn.py [-h] [--fzn <file>] [--output-base <name>] [--var-name <name>]
                     <model>.mzn
     
     emzn2fzn
@@ -89,11 +89,11 @@ generated as usual, the model becomes *unsatisfiable*:
     ...
     =====UNSATISFIABLE=====
 
-If instead we use the `emzn2fzn` compiler, the
+If instead we use the `emzn2fzn.py` compiler, the
 model remains *satisfiable* and the same optimal
 solution is found:
 
-    ~$ emzn2fzn --no-output-ozn --fzn example/enhanced.fzn example/model.mzn
+    ~$ emzn2fzn.py --no-output-ozn --fzn example/enhanced.fzn example/model.mzn
     ~$ optimathsat -input=fzn \
                    -opt.fzn.bv_integers=True \
                    -opt.theory.bv.engine=obvbs \
