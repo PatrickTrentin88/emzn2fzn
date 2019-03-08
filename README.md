@@ -12,14 +12,14 @@ division (NUM / DEN) among two floating-point values <NUM, DEN>
 with the result of this division. By construction, this result
 is a finite-precision floating-point value.
 
-This represents a limitation for the OMT solver
+    This represents a limitation for the OMT solver
 [`OptiMathSAT`](http://optimathsat.disi.unitn.it/),
 which can deal with `FlatZinc` files using infinite-precision
 arithmetic, because the presence of finite-precision
 floating-point values in the `FlatZinc` model can alter
 the result of the computation.
 
-The `emzn2fzn` compiler overcomes this issue by replacing
+    The `emzn2fzn` compiler overcomes this issue by replacing
 any occurrence of floating-point division (NUM / DEN) among
 two constant values with a floating-point variable, thus
 preventing the finite-precision floating-point computation.
@@ -31,7 +31,7 @@ this transformation simple Boolean logic which could be easily handled
 via Boolean Constraint Propagation now requires the intervention of the
 more expensive LA-Solver().
 
-[`OptiMathSAT`](http://optimathsat.disi.unitn.it/) contains heuristic
+    [`OptiMathSAT`](http://optimathsat.disi.unitn.it/) contains heuristic
 procedures which attempt to solve this bottleneck through internal
 rewriting of the input constraints. These heuristic procedures can
 be helped by appropriately sorting `bool2int` constraints so that
