@@ -8,6 +8,7 @@ import fileinput
 import io
 import os.path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -29,7 +30,7 @@ def main():
 
 def get_cmdline_options():
     """parses and returns input parameters."""
-    parser = argparse.ArgumentParser(description='emzn2fzn.py')
+    parser = argparse.ArgumentParser(description="An enhanced mzn2fzn compiler for OptiMathSAT.")
     parser.add_argument("model", metavar="<model>.mzn", type=str,
                         help="The MiniZinc model", action=check_ext(['mzn']))
     parser.add_argument("--fzn", "--output-fzn-to-file", metavar="<file>",
@@ -40,6 +41,8 @@ def get_cmdline_options():
     parser.add_argument("--var-name", metavar="<name>", type=str,
                         help="Base name for floating point variables",
                         default="float_const")
+    parser.add_argument("--sort-bool2int", help="Sort bool2int constraints",
+                        action="store_true")
     return parser.parse_known_args()
 
 def check_ext(choices):
@@ -83,11 +86,12 @@ def collect_database(mzn_file, var_name):
 ### MINIZINC MODEL MANGLING
 ###
 
-def create_temporary_file(mzn_file):
-    """Creates a temporary file of type '.mzn' in the same
+def create_temporary_file(in_file, ext):
+    """Creates a temporary file of type 'ext' in the same
     directory as the input argument."""
-    dir_name = os.path.dirname(mzn_file)
-    file_desc, tmp_file = tempfile.mkstemp(suffix=".mzn", dir=dir_name)
+    dir_name = os.path.dirname(in_file)
+    suf = ".{}".format(ext)
+    file_desc, tmp_file = tempfile.mkstemp(suffix=suf, dir=dir_name)
     os.close(file_desc)
     return tmp_file
 
@@ -102,11 +106,11 @@ def create_mangled_mzn_file(mzn_file, fval2name):
     among constant numbers [i.e. (NUM / DEN)] with a fresh
     floating-point variable."""
     reg_exp = r"\(([0-9]+\.[0-9]+) / ([0-9]+\.[0-9]+)\)"
-    tmp_file = create_temporary_file(mzn_file)
+    tmp_file = create_temporary_file(mzn_file, "mzn")
 
     with open(tmp_file, "w") as fd_tmp:
         for value in fval2name.values():
-            fd_tmp.write('var float: {};\n'.format(value))
+            fd_tmp.write("var float: {};\n".format(value))
         with open(mzn_file, "r") as fd_mzn:
             fd_tmp.write(fd_mzn.read())
 
@@ -114,7 +118,7 @@ def create_mangled_mzn_file(mzn_file, fval2name):
         for line in fd_tmp:
             matches = re.findall(reg_exp, line)
             for match in matches:
-                smatch = '({} / {})'.format(*match)
+                smatch = "({} / {})".format(*match)
                 line = line.replace(smatch, fval2name[match])
             print(line, end='')
 
@@ -149,12 +153,43 @@ def mangle_fzn_file(fzn_file, var_name, name2fval):
             match = re.search(reg_exp, line)
             if match is not None:
                 decls.append(match.group(1))
-            if not cs_section and line.startswith('constraint'):
+            if not cs_section and line.startswith("constraint"):
                 cs_section = True
                 for key in decls:
                     values = name2fval[key]
-                    print('constraint float_div({}, {}, {});'.format(values[0], values[1], key))
+                    print("constraint float_div({}, {}, {});".format(values[0], values[1], key))
             print(line, end='')
+
+def sort_bool2int_in_fzn_file(fzn_file):
+    """Reorders bool2int constraints to appear at the beginning of the
+    constraints section."""
+    tmp_file = create_temporary_file(fzn_file, "fzn")
+
+    with open(tmp_file, "w") as fd_out:
+        with open(fzn_file, "r") as fd_in:
+            for line in fd_in:
+                if line.startswith("constraint"):
+                    if "bool2int" in line:
+                        fd_out.write(line)
+                    else:
+                        continue
+                elif line.startswith("solve"):
+                    continue
+                else:
+                    fd_out.write(line)
+            fd_in.seek(0)
+            for line in fd_in:
+                if line.startswith("constraint"):
+                    if "bool2int" in line:
+                        continue
+                    else:
+                        fd_out.write(line)
+                elif line.startswith("solve"):
+                    fd_out.write(line)
+                else:
+                    continue
+
+    shutil.move(tmp_file, fzn_file)
 
 ###
 ### MZN2FZN
@@ -185,6 +220,8 @@ def mzn2fzn(known_args, other_args, fval2name, name2fval):
         subprocess.run(sp_args)
         fzn_file = get_fzn_file_name(known_args)
         mangle_fzn_file(fzn_file, known_args.var_name, name2fval)
+        if known_args.sort_bool2int:
+            sort_bool2int_in_fzn_file(fzn_file)
     finally:
         delete_temporary_file(tmp_file)
 

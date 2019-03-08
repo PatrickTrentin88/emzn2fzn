@@ -5,9 +5,9 @@ so as to get around some of its limitations and make the best use
 of [`OptiMathSAT`](http://optimathsat.disi.unitn.it/).
 
 
-## THE PROBLEM
+## THE PROBLEM(s)
 
-The `mzn2fzn` compiler replaces any occurrence of floating-point
+- The `mzn2fzn` compiler replaces any occurrence of floating-point
 division (NUM / DEN) among two floating-point values <NUM, DEN>
 with the result of this division. By construction, this result
 is a finite-precision floating-point value.
@@ -23,6 +23,19 @@ The `emzn2fzn` compiler overcomes this issue by replacing
 any occurrence of floating-point division (NUM / DEN) among
 two constant values with a floating-point variable, thus
 preventing the finite-precision floating-point computation.
+
+- The `mzn2fzn` compiler frequently generates 0/1 variables
+as aliases of Boolean variables. This encoding can be a bottleneck
+for [`OptiMathSAT`](http://optimathsat.disi.unitn.it/), because after
+this transformation simple Boolean logic which could be easily handled
+via Boolean Constraint Propagation now requires the intervention of the
+more expensive LA-Solver().
+
+[`OptiMathSAT`](http://optimathsat.disi.unitn.it/) contains heuristic
+procedures which attempt to solve this bottleneck through internal
+rewriting of the input constraints. These heuristic procedures can
+be helped by appropriately sorting `bool2int` constraints so that
+they appear at the beginning of the constraints section.
 
 
 ## INSTALLATION
@@ -41,10 +54,11 @@ To make this change permanent, please consider editing the
 ## USAGE
 
     ~$ emzn2fzn.py
-    usage: emzn2fzn.py [-h] [--fzn <file>] [--output-base <name>] [--var-name <name>]
-                    <model>.mzn
+    usage: emzn2fzn.py [-h] [--fzn <file>] [--output-base <name>]
+                       [--var-name <name>] [--sort-bool2int]
+                       <model>.mzn
     
-    emzn2fzn
+    An enhanced mzn2fzn compiler for OptiMathSAT.
     
     positional arguments:
       <model>.mzn           The MiniZinc model
@@ -55,6 +69,7 @@ To make this change permanent, please consider editing the
                             Filename for generated FlatZinc output
       --output-base <name>  Base name for output files
       --var-name <name>     Base name for floating point variables
+      --sort-bool2int       Sort bool2int constraints
 
 
 ## EXAMPLE
@@ -105,11 +120,13 @@ solution is found:
     ----------
     =========
     
+
 ## NOTES
 
 Please contact the author of this repository, or the current maintainer
 of the [`OptiMathSAT`](http://optimathsat.disi.unitn.it/), in the case
 that there is still any persisting issue with your `MiniZinc` models.
+
 
 ## Contributors
 
