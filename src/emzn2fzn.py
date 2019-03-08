@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#!python
 
 """This module compiles a MiniZinc model into a FlatZinc model."""
 
