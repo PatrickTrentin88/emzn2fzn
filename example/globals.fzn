@@ -1,0 +1,14 @@
+predicate optimathsat_all_different_int(array [int] of var int: x);
+var int: X_INTRODUCED_0_;
+var int: X_INTRODUCED_1_;
+var int: X_INTRODUCED_2_;
+var int: X_INTRODUCED_3_;
+var int: X_INTRODUCED_4_;
+var int: X_INTRODUCED_5_;
+var int: X_INTRODUCED_6_;
+var int: X_INTRODUCED_7_;
+var int: X_INTRODUCED_8_;
+var int: X_INTRODUCED_9_;
+array [1..10] of var int: arr:: output_array([1..10]) = [X_INTRODUCED_0_,X_INTRODUCED_1_,X_INTRODUCED_2_,X_INTRODUCED_3_,X_INTRODUCED_4_,X_INTRODUCED_5_,X_INTRODUCED_6_,X_INTRODUCED_7_,X_INTRODUCED_8_,X_INTRODUCED_9_];
+constraint optimathsat_all_different_int(arr);
+solve  satisfy;

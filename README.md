@@ -1,11 +1,11 @@
-## DESCRIPTION
+# DESCRIPTION
 
 The **emzn2fzn** project tweaks the output of the `mzn2fzn` compiler
 so as to get around some of its limitations and make the best use
 of [`OptiMathSAT`](http://optimathsat.disi.unitn.it/).
 
 
-## THE PROBLEM(s)
+# THE PROBLEM(s)
 
 - The `mzn2fzn` compiler replaces any occurrence of floating-point
 division (NUM / DEN) among two floating-point values <NUM, DEN>
@@ -38,20 +38,31 @@ be helped by appropriately sorting `bool2int` constraints so that
 they appear at the beginning of the constraints section.
 
 
-## INSTALLATION
+- For convenience reasons, this project distributes a copy of
+[`OptiMathSAT`](http://optimathsat.disi.unitn.it/) global
+constraints for `MiniZinc`, that can be used when converting
+a file.
+
+
+# INSTALLATION
 
 The `emzn2fzn` compiler requires `Python 3.5` or superior.
 
-To install the file, add the location of the `emzn2fzn` script
-to the `PATH` environment variable, e.g.
+To install the compiler, add the location of the `emzn2fzn` script
+to the `PATH` environment variable:
 
     export PATH=$PATH:.../emzn2fzn/src/
 
-To make this change permanent, please consider editing the
+and also export the name of the global constraints directory
+of OptiMathSAT:
+
+    export SMT2_GLOBALS_DIR=.../emzn2fzn/smt2/
+
+To make these changes permanent, please consider editing the
 `~/.bashrc` file.
 
 
-## USAGE
+# USAGE
 
     ~$ emzn2fzn.py
     usage: emzn2fzn.py [-h] [--fzn <file>] [--output-base <name>]
@@ -71,11 +82,18 @@ To make this change permanent, please consider editing the
       --var-name <name>     Base name for floating point variables
       --sort-bool2int       Sort bool2int constraints
 
+In addition, the `emzn2fzn.py` script accepts all valid options for
+the `mzn2fzn` tool. These options **must** appear after the file
+`<model>.mzn` in order to be handed over to the compiler.
 
-## EXAMPLE
 
-This example requires [`OptiMathSAT`](http://optimathsat.disi.unitn.it/)
+# EXAMPLES
+
+These examples require [`OptiMathSAT`](http://optimathsat.disi.unitn.it/)
 version `1.6.2` or superior.
+
+
+## Example #01: Floating-Point Correctness
 
 The original `SMT2` model is *satisfiable*:
 
@@ -119,16 +137,41 @@ solution is found:
     opt_var_0 = 34;
     ----------
     =========
-    
 
-## NOTES
+
+## Example #02: `bool2int` Sorting
+
+To sort `bool2int` constraints sorting, activate
+the command-line option:
+
+    ~$ emzn2fzn.py --sort-bool2int --fzn example/sorted.fzn example/model.mzn
+
+
+## Example #03: SMT2 Global Constraints
+
+To use OptiMathSAT Global Constraints, specify the
+*absolute path* to the `smt2` directory distributed
+within this package. Then add the following option
+to the solver, which is forwarded to the underlying
+`mzn2fzn` compiler:
+
+    ~$ emzn2fzn.py -I ${SMT2_GLOBALS_DIR} --fzn example/globals.fzn example/globals.mzn
+
+For a comparison, generate the `FlatZinc` model of
+the same `MiniZinc` instance without specifying the
+directory of global constraints:
+
+    ~$ emzn2fzn.py --fzn example/noglobals.fzn example/globals.mzn
+
+
+# NOTES
 
 Please contact the author of this repository, or the current maintainer
 of the [`OptiMathSAT`](http://optimathsat.disi.unitn.it/), in the case
 that there is still any persisting issue with your `MiniZinc` models.
 
 
-## Contributors
+# Contributors
 
 This project is authored by [Patrick Trentin](http://www.patricktrentin.com) (<patrick.trentin.88@gmail.com>).
 

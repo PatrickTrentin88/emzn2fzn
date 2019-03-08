@@ -43,6 +43,9 @@ def get_cmdline_options():
                         default="float_const")
     parser.add_argument("--sort-bool2int", help="Sort bool2int constraints",
                         action="store_true")
+    parser.add_argument("-I", "--search-dir", metavar="<dir>", type=str,
+                        help="Additionally search for included files in <dir>.",
+                        default=None)
     return parser.parse_known_args()
 
 def check_ext(choices):
@@ -208,6 +211,9 @@ def get_mzn2fzn_cmdline_args(mzn_file, known_args, other_args):
         fzn_file = get_fzn_file_name(known_args)
         args.append("--fzn")
         args.append(fzn_file)
+    if known_args.search_dir is not None:
+        args.append("-I")
+        args.append(known_args.search_dir)
     args.extend(other_args)
     return args
 
