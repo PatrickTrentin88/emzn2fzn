@@ -68,7 +68,7 @@ To make these changes permanent, please consider editing the
 
     ~$ emzn2fzn.py
     usage: emzn2fzn.py [-h] [--fzn <file>] [--output-base <name>]
-                       [--var-name <name>] [--sort-bool2int]
+                       [--var-name <name>] [--sort-bool2int] [-I <dir>]
                        <model>.mzn
     
     An enhanced mzn2fzn compiler for OptiMathSAT.
@@ -83,6 +83,8 @@ To make these changes permanent, please consider editing the
       --output-base <name>  Base name for output files
       --var-name <name>     Base name for floating point variables
       --sort-bool2int       Sort bool2int constraints
+      -I <dir>, --search-dir <dir>
+                            Additionally search for included files in <dir>.
 
 In addition, the `emzn2fzn.py` script accepts all valid options for
 the `mzn2fzn` tool. These options **must** appear after the file
