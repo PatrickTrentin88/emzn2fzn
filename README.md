@@ -53,8 +53,10 @@ to the `PATH` environment variable:
 
     export PATH=$PATH:.../emzn2fzn/src/
 
-and also export the name of the global constraints directory
-of OptiMathSAT:
+and also export the absolute path to the the global constraints
+directory of [`OptiMathSAT`](http://optimathsat.disi.unitn.it/)
+distributed with this package (or downloaded from the official
+website):
 
     export SMT2_GLOBALS_DIR=.../emzn2fzn/smt2/
 
@@ -84,7 +86,7 @@ To make these changes permanent, please consider editing the
 
 In addition, the `emzn2fzn.py` script accepts all valid options for
 the `mzn2fzn` tool. These options **must** appear after the file
-`<model>.mzn` in order to be handed over to the compiler.
+`<model>.mzn` in order to be correctly handed over to the compiler.
 
 
 # EXAMPLES
@@ -149,11 +151,11 @@ the command-line option:
 
 ## Example #03: SMT2 Global Constraints
 
-To use OptiMathSAT Global Constraints, specify the
-*absolute path* to the `smt2` directory distributed
-within this package. Then add the following option
-to the solver, which is forwarded to the underlying
-`mzn2fzn` compiler:
+To use [`OptiMathSAT`](http://optimathsat.disi.unitn.it/)
+Global Constraints, specify the *absolute path* to the `smt2`
+directory distributed within this package. Then add the
+following option to the solver, which is forwarded to the
+underlying `mzn2fzn` compiler:
 
     ~$ emzn2fzn.py -I ${SMT2_GLOBALS_DIR} --fzn example/globals.fzn example/globals.mzn
 
