@@ -271,7 +271,7 @@ def parse_mo(fzn_file):
 
 def get_mzn2fzn_cmdline_args(mzn_file, known_args, other_args):
     """Determines the command-line arguments for the mzn2fzn call."""
-    args = ["minizinc", "-c", "--solver", "org.minizinc.mzn-fzn",  mzn_file]
+    args = ["minizinc", "-c", "--solver", "org.minizinc.mzn-fzn",  mzn_file, "--no-output-ozn"]
     if known_args.fzn is not None:
         args.append("--fzn")
         args.append(known_args.fzn)
