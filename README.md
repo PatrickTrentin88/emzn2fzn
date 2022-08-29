@@ -53,12 +53,19 @@ to the `PATH` environment variable:
 
     export PATH=$PATH:.../emzn2fzn/src/
 
+Next, copy the contents of `std` to your shared minizinc folder
+
+  ```
+  cp std <YOUR_MINIZINC_PATH>/share/minizinc/std
+  ``` 
+
 and also export the absolute path to the the global constraints
 directory of [`OptiMathSAT`](http://optimathsat.disi.unitn.it/)
 distributed with this package (or downloaded from the official
 website):
 
     export SMT2_GLOBALS_DIR=.../emzn2fzn/smt2/
+
 
 To make these changes permanent, please consider editing the
 `~/.bashrc` file.

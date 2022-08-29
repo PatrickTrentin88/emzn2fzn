@@ -11,10 +11,12 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import numpy as np
 
 ###
 ### MAIN
 ###
+
 
 def main():
     """The main executable."""
@@ -193,13 +195,83 @@ def sort_bool2int_in_fzn_file(fzn_file):
 
     shutil.move(tmp_file, fzn_file)
 
+def parse_mo(fzn_file):
+
+    # keywords (see pareto_mo.mzn)
+    goals_key = "goals_p"
+    maximize_key = "maximize_p"
+    minimize_key = "minimize_p"
+
+    changes_made = False
+    new_fzn_string = None
+
+    with open(fzn_file, 'r') as file:
+        fzn_content = file.read()
+        fzn_splitted = fzn_content.split(";")
+
+        new_fzn_statements = np.array([])
+
+        for statement in fzn_splitted:
+            if statement.startswith("solve") or statement.startswith("\nsolve"):
+                annotations = statement.split("::")
+
+                # filter out "solve"
+                annotations = [a for a in annotations if "solve" not in a]
+
+                # filter out "satisfy", spaces, tabs and new lines
+                annotations = [
+                    a.replace(
+                        "satisfy", ""
+                    ).replace(
+                        " ",""
+                    ).replace(
+                        "\t",""
+                    ).replace(
+                        "\n", ""
+                    )
+                    for a in annotations
+                ]
+
+                other_annotations = [ann for ann in annotations if not ann.startswith(goals_key)]
+
+                new_solve_statement = statement
+
+                for ann in annotations:
+                    if ann.startswith(goals_key):
+                        start_index = ann.find("[")+1
+                        end_index = ann.rfind("]")
+                        goal_list = ann[start_index:end_index].split(",")
+
+                        # go over all objectives and parse them to flatzinc objectives
+                        def parse_mzn_objective(mzn_objective):
+                            is_max = maximize_key in mzn_objective
+                            ann_direction_keyword = maximize_key if is_max else minimize_key
+                            minizinc_direction_keyword = "maximize" if is_max else "minimize"
+                            value = mzn_objective[len(ann_direction_keyword)+1:len(mzn_objective)-1]
+                            return f"{minizinc_direction_keyword} {value}"
+
+                        parsed_objectives = ', '.join([parse_mzn_objective(x) for x in goal_list])
+
+                        # construct new solve statement
+                        annotations_parsed = ''.join([f":: {ann_other} " for ann_other in other_annotations])
+                        new_solve_statement = f"\nsolve {annotations_parsed}{parsed_objectives}"
+                new_fzn_statements = np.append(new_fzn_statements, new_solve_statement)
+                changes_made = True
+            else:
+                new_fzn_statements = np.append(new_fzn_statements, statement)
+        new_fzn_string = ";".join(new_fzn_statements)
+
+    if changes_made:
+        with open(fzn_file, 'w') as f:
+            f.write(new_fzn_string)
+
 ###
 ### MZN2FZN
 ###
 
 def get_mzn2fzn_cmdline_args(mzn_file, known_args, other_args):
     """Determines the command-line arguments for the mzn2fzn call."""
-    args = ["mzn2fzn", mzn_file, "--no-output-ozn"]
+    args = ["minizinc", "-c", "--solver", "org.minizinc.mzn-fzn",  mzn_file]
     if known_args.fzn is not None:
         args.append("--fzn")
         args.append(known_args.fzn)
@@ -227,6 +299,7 @@ def mzn2fzn(known_args, other_args, fval2name, name2fval):
         mangle_fzn_file(fzn_file, known_args.var_name, name2fval)
         if known_args.sort_bool2int:
             sort_bool2int_in_fzn_file(fzn_file)
+        parse_mo(fzn_file)
     finally:
         delete_temporary_file(tmp_file)
 
