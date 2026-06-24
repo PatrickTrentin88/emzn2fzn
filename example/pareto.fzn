@@ -1,0 +1,5 @@
+array [1..2] of int: X_INTRODUCED_2_ = [1,1];
+var 1..9: v1:: output_var:: is_defined_var;
+var 1..10: v2:: output_var;
+constraint int_lin_eq(X_INTRODUCED_2_,[v1,v2],10):: defines_var(v1);
+solve maximize v1, maximize v2;
